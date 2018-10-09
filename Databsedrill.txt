@@ -1,0 +1,113 @@
+CREATE DATABASE Lms;
+USE Lms
+CREATE TABLE LibraryBranch (
+           BranchID INT PRIMARY KEY NOT NULL IDENTITY(1,1),
+		   BranchName VARCHAR(50) NOT NULL,
+		   AddressID varchar(255) NOT NULL
+	       );
+CREATE TABLE Publisher (
+           PublisherName varchar(255) PRIMARY KEY,
+		   AddressID varchar(255) NOT NULL,
+		   Phone INT
+		   );
+CREATE TABLE Books (
+            BookID INT PRIMARY KEY NOT NULL IDENTITY(1,1),
+			Title nvarchar(255) NOT NULL,
+			PublisherName nvarchar(255)
+                );
+
+CREATE TABLE Authors (
+             BookID INT,
+			 AuthorName varchar(255)
+			 );
+CREATE TABLE BookCopies (
+			BookID INT ,
+			BranchID INT,
+			NumberOfCopies INT
+						  );
+CREATE TABLE Bookloans (
+			 BookID INT,
+			 BranchID INT,
+			 CardNo INT,
+			 DateOut DATETIME,
+			 DateDue DATETIME
+			 );
+CREATE TABLE Borrower (
+			 CardNo INT PRIMARY KEY NOT NULL IDENTITY(1,1),
+			 Name varchar(255) NOT NULL,
+			 AddressID varchar(255) NOT NULL,
+			  Phone INT
+			  );
+INSERT INTO LibraryBranch
+		(BranchName, AddressID)
+		VALUES 
+		('Sharpstown', '2'),
+		('Central', '3')
+	;
+INSERT INTO Books 
+          (Title, PublisherName)
+		  VALUES
+		  ('The Lost Tribe','Stephen King' )
+		 
+		  ;
+INSERT INTO BookCopies
+			(BookID ,BranchID ,NumberOfCopies)
+			VALUES
+			('116', '21', '41')
+			;
+INSERT INTO Books 
+          (Title, PublisherName)
+		  VALUES
+		  
+		  ('Love', 'Stephen King' )
+		  ;
+/***** CREATE STORED PROCEDURES THAT WILL QUERY FOR EACH OF THE FOLLOWING QUESTIONS:*****/
+USE Lms
+Solution 1:
+
+SELECT bc.NumberOfCopies 
+FROM Books b, BookCopies bc, LibraryBranch bl WHERE b.BookID = bc.BookID AND
+              bc.BranchID = bl.BranchID AND
+              Title='The Lost Tribe' AND BranchName='Sharpstown';
+
+(2)
+SELECT BranchName, NumberOfCopies 
+          FROM ((Books JOIN BookCopies ) JOIN LibraryBranch ) 
+              WHERE Title='The Lost Tribe';
+  
+(3)
+Solution 
+SELECT Name FROM Borrower WHERE CardNo NOT IN (SELECT CardNo
+                    FROM Bookloans );
+
+(4)
+SELECT B.Title, R.Name, R.AddressID
+FROM Books B, Borrower R, BookCopies BL, LibraryBranch LB
+WHERE LB.BranchName='Sharpstown' AND LB.BranchId=BL.BranchId AND
+BL.DateDue='today' AND BL.CardNo=R.CardNo AND BL.BookID=B.BookID ;
+
+
+(5)
+  SELECT  L.BranchName, COUNT(*) 
+FROM LibraryBranch L, Bookloans BL
+WHERE         BL.BranchID = L.BranchID
+GROUP BY   L.BranchName;
+
+
+
+(6)
+
+
+SELECT B.Name, COUNT(*) 
+FROM Borrower B, Bookloans L
+WHERE B.CardNo = L.CardNo
+GROUP BY   B.CardNo, B.Name, B.AddressID
+HAVING        COUNT(*) > 5;
+
+
+(7)
+SELECT Title, NumberOfCopies FROM (((Authors NATURAL JOIN Books) NATURAL JOIN 
+BookCopies) NATURAL JOIN LibraryBranch)Books WHERE 
+          AuthorName='Stephen King' AND BranchName='Central'; 
+		 
+
